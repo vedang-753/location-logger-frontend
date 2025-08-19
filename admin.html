@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Location Logs</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h2>📍 Logged Locations</h2>
+    <button onclick="loadLogs()">Refresh</button>
+    <ul id="logs"></ul>
+
+    <script>
+      const SERVER_URL = "https://location-logger.onrender.com";
+
+      async function loadLogs() {
+        try {
+          const res = await fetch(`${SERVER_URL}/locations`);
+          const data = await res.json();
+
+          const logs = document.getElementById("logs");
+          logs.innerHTML = "";
+
+          if (!data.length) {
+            logs.innerHTML = "<li>No locations logged yet.</li>";
+            return;
+          }
+
+          data.forEach((loc) => {
+            const li = document.createElement("li");
+            li.innerText =
+              `${new Date(loc.timestamp).toLocaleString()} → Lat: ${loc.lat}, Lon: ${loc.lon}`;
+            logs.appendChild(li);
+          });
+        } catch (err) {
+          alert("Failed to load logs: " + err.message);
+        }
+      }
+
+      // auto-load when page opens
+      loadLogs();
+    </script>
+  </body>
+</html>

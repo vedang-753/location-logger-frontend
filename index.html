@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Location Logger</title>
+    <meta charset="UTF-8" />
+  </head>
+  <body>
+    <h2>Location Logger</h2>
+    <button onclick="sendLocation()">Share My Location</button>
+    <p id="status"></p>
+
+    <script>
+      const SERVER_URL = "https://location-logger.onrender.com";
+
+      async function sendLocation() {
+        if (!navigator.geolocation) {
+          document.getElementById("status").innerText = "Geolocation not supported.";
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          async (pos) => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+
+            document.getElementById("status").innerText =
+              `Sending: ${lat}, ${lon}...`;
+
+            try {
+              await fetch(`${SERVER_URL}/location`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  lat,
+                  lon,
+                  timestamp: Date.now()
+                })
+              });
+
+              document.getElementById("status").innerText = "✅ Location sent!";
+            } catch (err) {
+              document.getElementById("status").innerText = "❌ Error: " + err.message;
+            }
+          },
+          (err) => {
+            document.getElementById("status").innerText = `Error: ${err.message}`;
+          }
+        );
+      }
+    </script>
+  </body>
+</html>
